@@ -1,0 +1,353 @@
+For some reason, it isn’t able to find my file….
+
+import java.io.*;
+import java.util.StringTokenizer;
+
+public class WordFrequency_Application
+{
+
+private static BufferedReader infile;
+
+public static void main(String[] args)
+{
+    LinkedList wordList= new LinkedList();//create new linked list 
+    String line;//holds one line of text
+    String word;//holds one word
+    StringTokenizer tokenizer;
+    int wordCount=0;//counts total number of words in text file
+    try
+    {
+        FileReader fr = new FileReader ("aliceInWonderland.txt");
+        infile = new BufferedReader(fr);
+
+        line= infile.readLine();//reads first line of text file
+        
+        while (line!=null)//text file has more data
+        {
+            tokenizer = new StringTokenizer (line);//holds line
+           while (tokenizer.hasMoreTokens())//more words remain in tokenizer (line)
+            {
+                word = tokenizer.nextToken();//gets next word in tokenizer (line)
+                WordFrequency temp = new WordFrequency(word);//"wraps" word into //WordFrequency object
+                WordFrequency T= (WordFrequency) wordList.find(temp);//searches for object with "word" in list
+
+                if (T==null)//word does not exits in list - add the new word to the list
+                {
+                    WordFrequency wf = new WordFrequency(word);//create new word frequency //object
+                    wordList.addAtFront(wf);//add to list
+                 }//if
+                else//word exists in list - increment frequency
+                {
+                    T.incrementFrequency();//increment word frequency
+                 }//else
+                    wordCount++; //increment word count 
+                }//while processing line
+                line=infile.readLine(); //read new tine from file 
+            }//while processing text
+    }//try
+
+catch (FileNotFoundException exception)
+{
+    System.out.println("no file found");
+}
+
+catch (IOException exception)
+{
+    System.out.println("unable to read from file");
+}
+
+System.out.println("number of words: "+wordCount);
+wordList.printList();
+
+}//main
+
+}//class WordFrequency_Application
+
+public class WordFrequency extends ListNode
+{
+    private String word;
+    private int frequency;
+
+public WordFrequency(String newWord)
+{
+    word = newWord;
+    frequency = 1;
+}//constructor
+
+public int getFrequency()
+{
+    return frequency;
+}//getFrequency
+
+public void incrementFrequency()
+{
+    frequency++;
+}//incrementFrequency
+
+public String getWord()
+{
+    return word;
+}//getWord
+
+public String toString()
+{
+    String myString;
+    myString = getWord() + " " + getFrequency();
+    return myString;
+}
+
+public boolean equals(Object otherWord)
+{
+    String S1 = this.getWord();
+    String S2 = ((WordFrequency)otherWord).getWord();//casts object into WordFrequency
+    return S1.equals(S2);
+}//equals
+
+}//class WordFrequency
+
+public class ListNode
+{
+     protected String data;
+     protected ListNode next;
+
+    public ListNode()
+    {
+        data = null;
+        next = null;
+    }//ListNode constructor
+
+public String getData()
+{
+    return data;
+}//getData
+
+
+public ListNode getNext()
+{
+    return next;
+}//getNext
+
+
+public void setData(String newData )
+{
+    data = newData;
+}//setData
+
+public String toString()
+{
+	return data;
+}
+
+public void setNext(ListNode nextNode)
+{
+    next = nextNode;
+}//setNext
+
+}//ListNode class
+
+
+public class LinkedList
+{
+
+    protected ListNode list;
+
+public LinkedList()
+{
+    list = null;
+}//constructor LinkedList
+
+public boolean listEmpty()
+{
+    return (list==null);
+}//listEmpty
+
+public void addAtFront(String objectToBeAdded)
+{
+
+    ListNode newNode = new ListNode();
+    newNode.setData(objectToBeAdded);
+    newNode.setNext(null);
+
+    if(listEmpty())
+        list = newNode;
+    else
+    {
+        newNode.setNext(list);
+        list=newNode;
+    }//else
+}//addAtFront Object
+
+
+public void addAtFront(ListNode nodeToAdd)
+{
+    nodeToAdd.setNext(list);
+    list=nodeToAdd;
+}//addAtFront ListNode
+
+public void deleteList()
+{
+    list=null;
+}//deleteList
+
+public void addInOrder(String objectToBeAdded)
+{
+	ListNode node = new ListNode();
+	node.setData(objectToBeAdded);
+	node.setNext(null);
+	ListNode p = list;
+	if(listEmpty())
+	{
+		list = node;
+	}
+	else if(objectToBeAdded.compareTo(p.getData()) < 0)
+	{
+		addAtFront(node);
+	}
+	else
+	{
+		while(p.getNext() != null && objectToBeAdded.compareTo(p.getNext().getData()) > 0)
+		{
+			p = list.getNext();
+		}
+		node.setNext(p.getNext());
+		p.setNext(node);
+	}
+}
+
+//must be ordered list
+public ListNode findInOrderedList(String target)
+{
+	ListNode p = list;
+	
+	while(p!= null && target.compareTo(p.getData()) < 0)
+	{
+		p = p.getNext();
+	}
+	if(p == null || !p.getData().equals(target))
+	{
+		System.out.println(target + " not found");
+	}
+	else
+	{
+		System.out.println(target + " found");
+	}
+
+return p;	
+}
+
+public void deleteFromList(String value)
+{
+	ListNode temp = list;
+	ListNode p = list;
+	while(temp != null && !value.equals(temp.getNext().getData()))
+	{
+		temp = temp.getNext();
+		p = p.getNext();
+	}
+	temp.setNext(temp.getNext().getNext());
+	printList();
+}
+
+public void printList()
+{
+    ListNode T;
+    T=list;
+    if (T==null)
+        System.out.println ("List is empty");
+    else
+    {
+        while (T!=null)
+        {
+            System.out.print(T.getData() + " ");
+            T = T.getNext();
+        }//while
+    }//else 
+}//printList
+
+
+public ListNode find(Object target)
+{
+    ListNode T=list;
+
+    while(T!=null && !target.equals(T.getData()))
+    {
+         T=T.getNext();
+    }//while
+
+    if(T==null)
+        System.out.println(target + " not found");
+    else
+        System.out.println (target + " found in list ");
+
+    return T;
+}//find
+
+public ListNode recursiveFind(ListNode p, String target)
+{
+	if(p != null)
+	{
+		if(p.getData().equals(target))
+		{
+			return p;
+		}
+		else if(p.getData().compareTo(target) < 0)
+		{
+			recursiveFind(p.getNext(), target);	
+		}
+		else
+		{
+			return null;
+		}
+	}
+	return null;
+		
+}
+
+public Integer listSize(ListNode p)
+{
+	int sum = 0;
+	if(p == null)
+	{ 
+		return 0;
+	}
+	else
+	{
+		sum++;
+		return sum + listSize(p.getNext());
+	}
+}
+
+
+public void reverseRecursivePrintList(ListNode alist)
+{
+    if (alist != null)
+    {
+        reverseRecursivePrintList(alist.getNext());
+        System.out.println(alist.getData());
+    }
+}//reverseRecursivePrintList
+
+public void reverseIterativePrintList()
+{
+	ListNode p = list;
+	LinkedList newList = new LinkedList();
+	while(p != null)
+	{
+		ListNode newNode = new ListNode();
+        newNode.setData(p.getData());
+        newList.addAtFront(newNode);
+        p = p.getNext();
+	}
+	newList.printList();
+}
+
+
+
+public ListNode List()
+{
+    return list;
+}
+
+}//class LinkedList
+
+
